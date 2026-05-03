@@ -1,23 +1,36 @@
 @echo off
-cd "C:\Users\baozh\OneDrive\文档\Knowledge Base\DCA Theory"
+cd /d "%~dp0"
 
-echo =========================
-echo Checking for changes...
-echo =========================
+echo ===============================
+echo Updating DCA Theory Vault
+echo ===============================
 
-git add .
+git status --porcelain > temp_status.txt
 
-git diff --cached --quiet
-IF %ERRORLEVEL% EQU 0 (
+for %%A in (temp_status.txt) do if %%~zA==0 (
     echo No changes to commit.
-) ELSE (
-    git commit -m "update notes"
-    git push
-    echo Changes pushed successfully!
+    del temp_status.txt
+    goto push
 )
 
-echo =========================
-echo Done.
-echo =========================
+del temp_status.txt
+
+git add .
+git commit -m "update notes %date% %time%"
+
+:push
+echo Pushing to GitHub...
+git push
+
+echo Opening GitHub Actions...
+start https://github.com/paulbliu/dca-vault/actions
+start https://github.com/paulbliu/paulbliu.github.io/actions
+
+echo Opening live site...
+start https://paulbliu.github.io
+
+echo ===============================
+echo Done!
+echo ===============================
 
 pause
